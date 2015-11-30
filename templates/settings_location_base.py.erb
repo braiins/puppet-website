@@ -12,3 +12,9 @@ DATABASE_USER = '<%= @db_user %>'
 DATABASE_PASSWORD = '<%= @db_password %>'
 
 DJANGO_SECRET_KEY = '<%= @django_secret_key %>'
+
+ALLOWED_HOSTS = [
+  <%- Array[@title, @aliases].flatten.each do |al| -%>
+   '<%= al %>',
+  <%- end -%>
+]
