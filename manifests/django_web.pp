@@ -125,19 +125,7 @@ define website::django_web(
                      ],
   },
   $admin_allowed_hosts=[],
-  $nginx_locations={
-    '/' => {
-      'proxy_pass'   => true,
-    },
-    '~* admin' => {
-      'proxy_pass'   => true,
-      'extra_opts'   => {
-        'allow'   =>  $admin_allowed_hosts,
-        'deny'    =>  'all',
-        'rewrite' => '^(.*) $1 break',
-      },
-    },
-  },
+  $nginx_locations=undef,
   $error_page='',
   $overlimit_error_page='',
   ) {
@@ -152,6 +140,35 @@ define website::django_web(
   $web_project_venv_path = "${web_project_root}/.env"
   $web_project_path = "${web_project_root}/${main_project_name}"
   $web_project_settings_location = "${web_project_path}/${main_module_name}/${settings_location_filename}"
+
+  $default_nginx_locations = {
+    '/' => {
+      'proxy_pass'   => true,
+    },
+    '~* admin' => {
+      'proxy_pass' => true,
+      'extra_opts' => {
+        'allow'   =>  $admin_allowed_hosts,
+        'deny'    =>  'all',
+        'rewrite' => '^(.*) $1 break',
+      },
+    },
+    '/static/' => {
+      'extra_opts' => {
+        'expires'    => '1w',
+        'add_header' => 'Cache-Control "public"',
+        'access_log' => 'off',
+        'alias'      => "${web_project_path}/static/",
+      },
+    },
+  }
+
+  if $nginx_locations {
+    $real_nginx_locations = $nginx_locations
+  }
+  else {
+    $real_nginx_locations = $default_nginx_locations
+  }
 
   # Global Git repository setup
   Vcsrepo {
@@ -221,7 +238,7 @@ define website::django_web(
     upstream_socket_path => getparam(Website::Gunicorn[ $title ], 'django_socket_path'),
     error_page           => $error_page,
     overlimit_error_page => $overlimit_error_page,
-    locations            => $nginx_locations,
+    locations            => $real_nginx_locations,
     server_opts          => $nginx_server_opts,
   }
 
