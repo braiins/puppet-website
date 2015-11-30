@@ -214,7 +214,7 @@ define website::django_web(
   Website::Vhost_nginx {
     require              => Website::Gunicorn[ $title ],
     serveraliases        => flatten([$title, $aliases]),
-    priority             => $priority,
+    priority             => $nginx_priority,
     upstream_socket_path => getparam(Website::Gunicorn[ $title ], 'django_socket_path'),
     error_page           => $error_page,
     overlimit_error_page => $overlimit_error_page,
@@ -224,6 +224,7 @@ define website::django_web(
 
   if $redirect_to_https {
     nginx::vhost { "http-${title}":
+      priority      => $nginx_priority,
       docroot       => undef,
       port          => $http_port,
       serveraliases => flatten([$title, $aliases]),
