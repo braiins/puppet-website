@@ -36,6 +36,8 @@
 #   database password
 # [*debug*]
 #   enable/disable debugging output of the application
+# [*django_secret_key*]
+#   secret key for the Django
 # [*settings_location_filename*]
 #   name of the file that stores the local settings of the application
 #   (defaults to settings_location.py
@@ -109,6 +111,7 @@ define website::django_web(
   $db_user,
   $db_password,
   $debug='False',
+  $django_secret_key,
   $settings_location_filename='settings_location.py',
   $settings_location_template='website/empty_template.erb',
   $settings_location_values=undef,
