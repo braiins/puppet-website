@@ -1,0 +1,13 @@
+{
+  "name": "braiins-website",
+  "version": "0.1.0",
+  "author": "braiins",
+  "summary": "Deployment of nginx + Django based websites",
+  "license": "Apache 2.0",
+  "source": "git://github.com/braiins/puppet-website.git",
+  "project_page": "https://github.com/braiins/puppet-website",
+  "issues_url": "https://github.com/braiins/puppet-website/issues",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 4.0.0"}
+  ]
+}

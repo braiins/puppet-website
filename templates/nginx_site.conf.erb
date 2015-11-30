@@ -1,0 +1,61 @@
+# Virtual host <%= @title %>
+# This file has been provided by puppet for <%= @fqdn %>.
+# DON'T EDIT it manually, any changes will be lost
+#
+
+upstream <%= @options['upstream_web'] %> {
+    server unix:<%= @options['upstream_socket_path'] %>;
+}
+
+server {
+  listen <%= @port %>;
+<% if @docroot then -%>
+  root  <%= @docroot %>;
+<%- end -%>
+  server_name <%= @serveraliases.join(" ") %>;
+<%# Expand all server options %>
+<% if @options['server_opts'] then -%>
+  <%- @options['server_opts'].keys.each do |opt| -%>
+    <%# Each key may contain a direct value or a an array of values. %>
+    <%- Array[@options['server_opts'][opt]].flatten.each do |opt_value| -%>
+      <%= opt %> <%= opt_value -%>;
+    <%- end -%>
+  <%- end -%>
+<%- end -%>
+
+  access_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @title %>.access.log;
+  error_log  <%= scope.lookupvar('nginx::log_dir')%>/<%= @title %>.error.log;
+
+<%- if @options['error_page'] != '' then -%>
+  error_page 404 500 502 503 504 /errors/<%= @options['error_page'] %>;
+<%- end -%>
+
+<% @options['locations'].keys.each do |location| %>
+  location <%= location %> {
+  <% if @options['locations'][location]['proxy_pass'] then -%>
+    proxy_pass http://<%= @options['upstream_web'] %>;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  <%- end -%>
+  <%- if ! @options['locations'][location]['extra_errors'].nil? -%>
+    <%- if @options['error_page'] != '' -%>
+      error_page <%= @options['locations'][location]['extra_errors']['standard_error_page'].join(' ') %> /errors/<%= @options['error_page'] %>;
+    <%- end -%>
+    <%- if @options['overlimit_error_page'] != '' then -%>
+      error_page <%= @options['locations'][location]['extra_errors']['overlimit_error_page'].join(' ') %> /errors/<%= @options['overlimit_error_page'] %>;
+    <%- end -%>
+  <%- end -%><%# if @options['extra_errors'] %>
+  <%# additional location specific options %>
+  <%- if @options['locations'][location]['extra_opts'] then -%>
+    <%- @options['locations'][location]['extra_opts'].each_pair do |opt, opt_value| -%>
+      <%# Each option may be a string or an array of strings %>
+      <%- Array[opt_value].flatten.each do |value| -%>
+        <%= opt %> <%= value -%>;
+      <%- end -%>
+    <%- end -%>
+  <%- end -%><%# if @options['locations'][location]['extra_opts'] %>
+  }
+<%- end -%>
+
+}
