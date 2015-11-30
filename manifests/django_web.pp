@@ -118,7 +118,6 @@ define website::django_web(
   $nginx_priority='50',
   $nginx_server_opts={
     'add_header' => [
-                     'X-Frame-Options DENY',
                      "Access-Control-Allow-Origin '*'",
                      'Access-Control-Allow-Credentials true',
                      "Access-Control-Allow-Headers 'Content-Type, Accept, X-Requested-With'",
