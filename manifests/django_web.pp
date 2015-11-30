@@ -202,6 +202,7 @@ define website::django_web(
     owner   => $user,
     group   => $user,
     mode    => '0640',
+    notify  => Website::Gunicorn[ $title ],
   } ->
   website::gunicorn { $title:
     user                  => $user,
