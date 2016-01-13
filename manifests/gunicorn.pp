@@ -14,6 +14,12 @@
 #  python virtual env path of the website project
 # [*web_project_path*]
 #  path to the main project of the website
+# [*wsgi_module_name*]
+#  name of the WSGI module
+# [*django_socket_path*]
+#  socket path for Django
+# [*log_path*]
+#  base path for storing logs
 #
 # === Examples
 #
@@ -37,16 +43,15 @@ define website::gunicorn(
   $web_project_root,
   $web_project_venv_path,
   $web_project_path,
-  $main_module_name,
+  $wsgi_module_name='wsgi',
   $django_socket_path,
+  $log_path="/var/log/${title}"
 ) {
   $user_home = getparam(User[$user], 'home')
   $gunicorn_pid_file = "${web_project_root}/django.pid"
   # Recommended number of workers is 2 * CPUCOUNT + 1
   $gunicorn_workers = 2 * $processorcount + 1
   $supervisor_program = "gunicorn-${title}"
-
-  $log_path = "/var/log/${title}"
 
   # supervisor managed applications always have 'supervisord'
   # tag. Therefore, we have to sort the logs based on message contents
@@ -61,7 +66,7 @@ define website::gunicorn(
     virtualenv => $web_project_venv_path,
   } ->
   supervisord::program { $supervisor_program:
-    command                  => "${web_project_venv_path}/bin/gunicorn -p ${gunicorn_pid_file} ${main_module_name}.wsgi -b unix:${django_socket_path} --timeout 100 --workers ${gunicorn_workers} --worker-connections 100 --max-requests 50000 ",
+    command                  => "${web_project_venv_path}/bin/gunicorn -p ${gunicorn_pid_file} ${wsgi_module_name}:application -b unix:${django_socket_path} --timeout 100 --workers ${gunicorn_workers} --worker-connections 100 --max-requests 50000 ",
     autostart                => true,
     # NOTE: autorestart is not bool but string as it may have values:
     # true/false/unexpected

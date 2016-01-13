@@ -20,6 +20,8 @@
 #   Name of the project how it should be cloned from git
 # [*main_module_name*]
 #   Name of the main module within the Django project (required by settings)
+# [*wsgi_module_name*]
+#   see website::gunicorn::wsgi_module_name
 # [*revision*]
 #   revision of the main Django project to be checked out
 # [*db_host*]
@@ -103,6 +105,7 @@ define website::django_web(
   $main_project_git_uri,
   $main_project_name,
   $main_module_name,
+  $wsgi_module_name,
   $revision,
   $compile_messages=true,
   $db_host=undef,
@@ -227,7 +230,7 @@ define website::django_web(
     web_project_venv_path => $web_project_venv_path,
     web_project_path      => $web_project_path,
     django_socket_path    => "${web_project_root}/django.sock",
-    main_module_name      => $main_module_name,
+    wsgi_module_name      => $wsgi_module_name,
   }
 
   # Default settings for nginx vhost configurations (shared for http and https)
