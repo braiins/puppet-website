@@ -22,9 +22,6 @@
 # Copyright 2015 Braiins Systems s.r.o.
 #
 class website {
-  package { 'npm':
-    ensure => present
-  }
   package { 'gettext':
     ensure => present
   }
