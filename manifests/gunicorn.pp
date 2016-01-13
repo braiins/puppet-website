@@ -6,8 +6,6 @@
 #
 # === Parameters
 #
-# [*name*]
-#  must be unique
 # [*user*]
 #  user running this website instance
 # [*web_project_root*]
