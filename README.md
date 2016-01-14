@@ -32,6 +32,10 @@ The module configures the each website as follows:
   configurations rely on the database to be already available on the
   remote machine
 
+Optionally, the module is able to install nodejs in the python virtual
+environment and all site specific packages via **npm**. See
+website::nodejs for details.
+
 ## Setup
 
 ### What website affects
@@ -76,6 +80,7 @@ Resources:
 * [website::django_web](#resource-websitedjango_web)
 * [website::vhost_nginx](#resource-websitevhost_nginx)
 * [website::gunicorn](#resource-websitevgunicorn)
+* [website::nodejs](#resource-websitenodejs)
 
 ## Limitations
 
