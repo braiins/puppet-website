@@ -85,7 +85,7 @@ define website::gunicorn(
     },
     directory                => $web_project_path,
     ensure_process           => $ensure_process_str,
-    stdout_logfile => 'syslog',
-    stderr_logfile => 'syslog',
+    stdout_logfile           => 'syslog',
+    stderr_logfile           => 'syslog',
   }
 }
