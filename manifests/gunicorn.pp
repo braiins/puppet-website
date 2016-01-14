@@ -20,6 +20,8 @@
 #  socket path for Django
 # [*log_path*]
 #  base path for storing logs
+# [*ensure_running*]
+#  true=>ensure that the gunicorn process is running when true, false=>ensure the process is stopped
 #
 # === Examples
 #
@@ -45,13 +47,17 @@ define website::gunicorn(
   $web_project_path,
   $wsgi_module_name='wsgi',
   $django_socket_path,
-  $log_path="/var/log/${title}"
+  $log_path="/var/log/${title}",
+  $ensure_running=true,
 ) {
   $user_home = getparam(User[$user], 'home')
   $gunicorn_pid_file = "${web_project_root}/django.pid"
   # Recommended number of workers is 2 * CPUCOUNT + 1
   $gunicorn_workers = 2 * $processorcount + 1
   $supervisor_program = "gunicorn-${title}"
+
+  # map the parameter onto string supported by supervisor::program
+  $ensure_process_str = $ensure_running ? {true => 'running', false => 'stopped'}
 
   # supervisor managed applications always have 'supervisord'
   # tag. Therefore, we have to sort the logs based on message contents
@@ -78,6 +84,7 @@ define website::gunicorn(
       'USER' => $user,
     },
     directory                => $web_project_path,
+    ensure_process           => $ensure_process_str,
     stdout_logfile => 'syslog',
     stderr_logfile => 'syslog',
   }
