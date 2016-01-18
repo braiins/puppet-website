@@ -1,0 +1,28 @@
+# This file has been provided by puppet for <%= @fqdn %>.
+# DON'T EDIT it manually, any changes will be lost
+[Unit]
+Description=Gunicorn service <%= @systemd_service %>
+After=network.target
+ConditionPathExists=<%= @gunicorn_exec %>
+
+[Service]
+Environment="HOME=<%= @user_home %>" 'USER=<%= @user %>'
+ExecStart=<%= @gunicorn_exec %> -p <%= @gunicorn_pid_file %> <%= @wsgi_module_name %>:application -b unix:<%= @django_socket_path %> --timeout 100 --workers 7 --worker-connections 100 --max-requests 50000
+KillMode=process
+Restart=always
+Type=simple
+PIDFile=<%= @gunicorn_pid_file %>
+User=<%= @user %>
+WorkingDirectory=<%= @web_project_path %>
+StandardOutput=syslog
+StandardError=inherit
+SyslogIdentifier=<%= @systemd_service %>
+<%# additional service specific options %>
+<%- if @service_opts then -%>
+    <%- @service_opts.each_pair do |opt, opt_value| -%>
+      <%= opt %>=<%= opt_value -%>
+    <%- end -%>
+<%- end -%>
+
+[Install]
+WantedBy=multi-user.target
