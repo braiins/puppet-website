@@ -17,10 +17,10 @@ WorkingDirectory=<%= @web_project_path %>
 StandardOutput=syslog
 StandardError=inherit
 SyslogIdentifier=<%= @systemd_service %>
-<%# additional service specific options %>
+<%# additional service specific options -%>
 <%- if @service_opts then -%>
     <%- @service_opts.each_pair do |opt, opt_value| -%>
-      <%= opt %>=<%= opt_value -%>
+      <%- %><%= opt %>=<%= opt_value %>
     <%- end -%>
 <%- end -%>
 
